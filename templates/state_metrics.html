@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>State Fraud Metrics</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .metric-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+        .metric-card:hover {
+            transform: translateY(-5px);
+        }
+        .confusion-matrix {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+        .confusion-cell {
+            padding: 10px;
+            border-radius: 5px;
+            text-align: center;
+            font-weight: bold;
+        }
+        .tp { background-color: #d4edda; color: #721c24; }
+        .fp { background-color: #f8d7da; color: #721c24; }
+        .tn { background-color: #d4edda; color: #155724; }
+        .fn { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <div class="container py-4">
+        <h1 class="mb-4">State-wise Fraud Metrics</h1>
+        <div class="row">
+            {% for state in state_data %}
+            <div class="col-md-6">
+                <div class="card metric-card">
+                    <div class="card-header bg-primary text-white">
+                        <h3>{{ state.state }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h5>Accuracy: {{ state.accuracy }}%</h5>
+                                <p>Total Cases: {{ state.total_cases }}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <h5>Confusion Matrix</h5>
+                                <!-- In your state_metrics.html template -->
+<div class="confusion-matrix">
+    <div class="confusion-cell tp">TP: {{ state.metrics.true_positives }}</div>
+    <div class="confusion-cell fp">FP: {{ state.metrics.false_positives }}</div>
+    <div class="confusion-cell fn">FN: {{ state.metrics.false_negatives }}</div>
+    <div class="confusion-cell tn">TN: {{ state.metrics.true_negatives }}</div>
+</div>
+                            </div>
+                        </div>
+                        <canvas id="chart-{{ loop.index }}" height="150"></canvas>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        {% for state in state_data %}
+        new Chart(
+            document.getElementById('chart-{{ loop.index }}'),
+            {
+                type: 'bar',
+                data: {
+                    labels: ['True Positives (Fraud)', 'False Positives (Fraud)', 
+                            'True Negatives (Non-Fraud)', 'False Negatives (Non-Fraud)'],
+                    datasets: [{
+                        label: 'Case Count',
+                        data: [
+                            {{ state.metrics.true_positives }}, // TP
+                            {{ state.metrics.false_positives }}, // FP
+                            {{ state.metrics.true_negatives }}, // TN
+                            {{ state.metrics.false_negatives }}  // FN
+                        ],
+                        backgroundColor: [
+                            '#dc3545', // Red for TP (Fraud correctly identified)
+                            '#ff6b6b', // Light red for FP (Incorrect Fraud)
+                            '#28a745', // Green for TN (Non-Fraud correctly identified)
+                            '#4dab9a'  // Teal for FN (Missed Fraud)
+                        ]
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    const labels = [
+                                        'True Fraud Cases',
+                                        'False Fraud Alerts',
+                                        'Verified Non-Fraud Cases',
+                                        'Missed Fraud Cases'
+                                    ];
+                                    return `${labels[context.dataIndex]}: ${context.raw}`;
+                                }
+                            }
+                        }
+                    },
+                    scales: {
+                        y: { beginAtZero: true, ticks: { precision: 0 } }
+                    }
+                }
+            }
+        );
+        {% endfor %}
+    </script>
+</body>
+</html>

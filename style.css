@@ -1,0 +1,48 @@
+html, body {
+    height: 100%;
+    background: #000 !important;
+    margin: 0;
+    padding: 0;
+    color: white;
+  }
+  
+  .main-section {
+    min-height: 100vh;
+    background-color: transparent !important;
+  }
+  
+  .modal-content {
+    background-color: #f9f4f4 !important;
+    color: black; /* Set color to black for modal text */
+    border: 1px solid #333;
+  }
+  
+  .form-control {
+    background-color: #f3f2f2 !important;
+    color: black !important; /* Set color to black for form input text */
+    border: 1px solid #444;
+  }
+  
+  .form-control::placeholder {
+    color: #888; /* Light gray for placeholder text */
+  }
+  
+  canvas {
+    background-color: transparent !important;
+  }
+  
+  #particles-js {
+    position: fixed;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+  }
+  .btn-sm-outline-danger {
+    padding: 0.25rem 0.5rem;
+    font-size: 0.75rem;
+    border-radius: 0.2rem;
+}
+
+.btn-sm-outline-danger i {
+    margin-right: 0;
+}  
